@@ -44,4 +44,4 @@ This project enables secure attendance management with fingerprint enrollment, s
 
 ---
 
-## ⚡ Circuit Connections
+
