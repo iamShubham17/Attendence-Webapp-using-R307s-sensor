@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fingerprint Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4a90e2;
+            --secondary: #5cb85c;
+            --danger: #d9534f;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            
+          background: url('img1.jpg') no-repeat center center;
+    background-size: cover;   /* makes it fill the box */
+    border-radius: 15px;      /* keep rounded corners */
+    padding: 40px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 1200px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            color: var(--dark);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #3a7bc8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: var(--secondary);
+        }
+
+        .btn-success:hover {
+            background: #4cae4c;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #c9302c;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--dark);
+        }
+
+        .switch-auth a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .navbar {
+            background: var(--dark);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+        }
+
+        .user-info {
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-connected {
+            background: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+
+        .status-disconnected {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(92, 184, 92, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(92, 184, 92, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(92, 184, 92, 0);
+            }
+        }
+
+        .sensor-status {
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .fingerprint-scanner {
+            text-align: center;
+            padding: 40px;
+            border: 3px dashed var(--primary);
+            border-radius: 10px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fingerprint-icon {
+            font-size: 80px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .scan-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary);
+            animation: scan 2s infinite;
+            display: none;
+        }
+
+        .scanning .scan-animation {
+            display: block;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(200px);
+            }
+        }
+
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .employee-table th,
+        .employee-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .employee-table th {
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .employee-table tr:hover {
+            background: var(--light);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .login-logs {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 10px;
+            background: var(--light);
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .employee-table {
+                font-size: 14px;
+            }
+
+            .employee-table th,
+            .employee-table td {
+                padding: 8px;
+            }
+        }
+
+        .loader {
+            border: 3px solid var(--light);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+         .auth-container {
+   
+
+ background: rgba(255, 255, 255, 0.1); /* 10% opaque → very transparent */
+  border-radius: 12px;
+  padding: 25px;
+  backdrop-filter: blur(10px); /* stronger blur for readability */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* subtle glass border */
+  box-shadow: 0 4px 25px rgba(0,0,0,0.4); /* stronger shadow so it pops */
+  }
+
+   body {
+    background: url('12.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Registration/Login Section -->
+        <div id="authSection">
+            <!-- Registration Form -->
+            <div id="registerForm" class="auth-container">
+                <h1>Admin Registration</h1>
+                <div id="registerAlert"></div>
+                <form id="registerFormEl">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn" id="registerBtn">Register</button>
+                </form>
+                <div class="switch-auth">
+                    Already registered? <a href="#" onclick="showLogin()">Login here</a>
+                </div>
+                <div id="registerDebug" class="debug-info hidden"></div>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-container hidden">
+                <h1>Admin Login</h1>
+                <div id="loginAlert"></div>
+                <form id="loginFormEl">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn" id="loginBtn">Login</button>
+                </form>
+                <div class="switch-auth">
+                    Not registered? <a href="#" onclick="showRegister()">Register here</a>
+                </div>
+                <div id="loginDebug" class="debug-info hidden"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="dashboard">
+            <div class="navbar">
+                <div class="nav-links">
+                    <a href="#" class="nav-link active" onclick="showTab('home')">Home</a>
+                    <a href="#" class="nav-link" onclick="showTab('addEmployee')">Add Employee</a>
+                    <a href="#" class="nav-link" onclick="showTab('viewEmployees')">All Employees</a>
+                </div>
+                <div class="user-info">
+                    <span id="currentUser">Admin</span>
+                    <button class="btn btn-danger" style="width: auto; padding: 8px 16px;" onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Home Tab -->
+            <div id="homeTab" class="tab-content active">
+                <h2>Today's Login Activity</h2>
+                <div id="alertContainer"></div>
+                <div class="login-logs" id="loginLogs">
+                    <div class="loader"></div>
+                </div>
+            </div>
+
+            <!-- Add Employee Tab -->
+            <div id="addEmployeeTab" class="tab-content">
+                <h2>Add New Employee</h2>
+                <div class="sensor-status">
+                    <div>
+                        <span class="status-indicator status-disconnected" id="sensorIndicator"></span>
+                        <span id="sensorStatus">Checking sensor connection...</span>
+                    </div>
+                    <button class="btn" style="width: auto;" onclick="checkSensorConnection()">Refresh Status</button>
+                </div>
+                
+                <form onsubmit="handleAddEmployee(event)">
+                    <div class="form-group">
+                        <label>Employee Name</label>
+                        <input type="text" id="empName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <input type="text" id="empRole" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Employee ID</label>
+                        <input type="text" id="empId" required>
+                    </div>
+                    
+                    <div class="fingerprint-scanner" id="fingerprintScanner">
+                        <div class="scan-animation"></div>
+                        <div class="fingerprint-icon">🔒</div>
+                        <h3>Fingerprint Scanner</h3>
+                        <p id="scanStatus">Click below to start scanning</p>
+                        <button type="button" class="btn btn-success" style="margin-top: 20px;" onclick="startFingerprintScan()">
+                            Start Fingerprint Scan
+                        </button>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="enrollBtn" disabled>Enroll Employee</button>
+                </form>
+            </div>
+
+            <!-- View Employees Tab -->
+            <div id="viewEmployeesTab" class="tab-content">
+                <h2>All Enrolled Employees</h2>
+                <div id="employeeTableContainer">
+                    <table class="employee-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Fingerprint ID</th>
+                                <th>Enrolled Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">
+                                    <div class="loader"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+  apiKey: "AIzaSyAeJTSidwzwmZ9t6I3b9Zhzgb6g80ZpSCo",
+  authDomain: "identify-53b1f.firebaseapp.com",
+  databaseURL: "https://identify-53b1f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "identify-53b1f",
+  storageBucket: "identify-53b1f.firebasestorage.app",
+  messagingSenderId: "636421880671",
+  appId: "1:636421880671:web:3bca2977ee08f207e994ea",
+  measurementId: "G-JZDR1MPJET"
+};
+
+        let app, auth, database;
+        let currentAdmin = null;
+        let fingerprintData = null;
+        let sensorConnected = false;
+        let firebaseInitialized = false;
+
+        // Initialize Firebase with error handling
+        async function initializeFirebase() {
+            try {
+                console.log('Initializing Firebase...');
+                
+                // Check if API key is placeholder
+                if (firebaseConfig.apiKey === "YOUR_ACTUAL_API_KEY_HERE") {
+                    console.log('⚠️ Using fallback config for testing');
+                    app = firebase.initializeApp(fallbackConfig);
+                } else {
+                    app = firebase.initializeApp(firebaseConfig);
+                }
+                
+                auth = firebase.auth();
+                database = firebase.database();
+                
+                // Test database connection
+                await database.ref('.info/connected').once('value');
+                
+                firebaseInitialized = true;
+                console.log('✅ Firebase initialized successfully');
+                
+                // Set up auth state listener
+                auth.onAuthStateChanged((user) => {
+                    console.log('Auth state changed:', user ? user.email : 'No user');
+                    if (user) {
+                        currentAdmin = user;
+                        showDashboard();
+                    } else {
+                        showAuth();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                firebaseInitialized = false;
+                
+                // Show specific instructions for API key error
+                if (error.code === 'auth/api-key-not-valid' || error.message.includes('api-key-not-valid')) {
+                    showConfigInstructions();
+                } else {
+                    showAlert('Firebase connection failed: ' + error.message, 'danger');
+                }
+            }
+        }
+
+        // Show Firebase configuration instructions
+        function showConfigInstructions() {
+            const authSection = document.getElementById('authSection');
+            authSection.innerHTML = `
+                <div class="auth-container">
+                    <h1>🔥 Firebase Configuration Required</h1>
+                    <div class="alert alert-info">
+                        <h3>📋 Setup Instructions:</h3>
+                        <ol style="text-align: left; margin: 20px 0;">
+                            <li><strong>Go to Firebase Console:</strong><br>
+                                Visit <a href="https://console.firebase.google.com" target="_blank">https://console.firebase.google.com</a>
+                            </li>
+                            <li><strong>Select Your Project:</strong><br>
+                                Click on "attendencebro" project
+                            </li>
+                            <li><strong>Get Web Config:</strong><br>
+                                • Click the gear icon ⚙️ → "Project Settings"<br>
+                                • Scroll to "Your apps" section<br>
+                                • Click on the web app or "Add app" if none exists<br>
+                                • Copy the config object
+                            </li>
+                            <li><strong>Enable Authentication:</strong><br>
+                                • Go to "Authentication" → "Sign-in method"<br>
+                                • Enable "Email/Password" provider
+                            </li>
+                            <li><strong>Update the Code:</strong><br>
+                                Replace the firebaseConfig object in the code with your actual config
+                            </li>
+                        </ol>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <strong>📄 Your config should look like:</strong>
+                            <pre style="font-size: 12px; overflow: auto;">
+const firebaseConfig = {
+  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  authDomain: "your-project.firebaseapp.com",
+  databaseURL: "https://your-project.firebaseio.com",
+  projectId: "your-project",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+                            </pre>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="retryFirebaseInit()">🔄 Retry Connection</button>
+                    
+                    <div style="margin-top: 20px;">
+                        <details>
+                            <summary style="cursor: pointer; color: #666;">🔍 Troubleshooting</summary>
+                            <div style="margin-top: 10px; text-align: left; font-size: 14px; color: #666;">
+                                <p><strong>Common Issues:</strong></p>
+                                <ul>
+                                    <li>API key is restricted to specific domains</li>
+                                    <li>Firebase project doesn't have Authentication enabled</li>
+                                    <li>Incorrect project ID or auth domain</li>
+                                    <li>Browser blocking requests (try incognito mode)</li>
+                                </ul>
+                                
+                                <p><strong>Check Browser Console (F12) for detailed errors</strong></p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Retry Firebase initialization
+        function retryFirebaseInit() {
+            location.reload();
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initializeFirebase);
+
+        // Show/Hide Functions
+        function showRegister() {
+            console.log('Showing register form');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            clearAlerts();
+        }
+
+        function showLogin() {
+            console.log('Showing login form');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            clearAlerts();
+        }
+
+        function showAuth() {
+            console.log('Showing auth section');
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+        }
+
+        function showDashboard() {
+            console.log('Showing dashboard');
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            if (currentAdmin) {
+                document.getElementById('currentUser').textContent = currentAdmin.email || currentAdmin.displayName || 'Admin';
+            }
+            loadLoginLogs();
+            loadEmployees();
+            checkSensorConnection();
+        }
+
+        function clearAlerts() {
+            document.getElementById('registerAlert').innerHTML = '';
+            document.getElementById('loginAlert').innerHTML = '';
+        }
+
+        // Tab Navigation
+        function showTab(tabName) {
+            console.log('Switching to tab:', tabName);
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            if (tabName === 'home') {
+                document.getElementById('homeTab').classList.add('active');
+                document.querySelectorAll('.nav-link')[0].classList.add('active');
+                loadLoginLogs();
+                setTimeout(addTestButton, 100); // Add test button after tab loads
+            } else if (tabName === 'addEmployee') {
+                document.getElementById('addEmployeeTab').classList.add('active');
+                document.querySelectorAll('.nav-link')[1].classList.add('active');
+                checkSensorConnection();
+            } else if (tabName === 'viewEmployees') {
+                document.getElementById('viewEmployeesTab').classList.add('active');
+                document.querySelectorAll('.nav-link')[2].classList.add('active');
+                loadEmployees();
+            }
+        }
+
+        // Registration Handler
+        document.getElementById('registerFormEl').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            if (!firebaseInitialized) {
+                showAlertInContainer('Firebase is not initialized. Please refresh the page.', 'danger', 'registerAlert');
+                return;
+            }
+
+            const registerBtn = document.getElementById('registerBtn');
+            const form = event.target;
+            
+            // Get form values
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            console.log('Register form submitted:', { name, email });
+
+            // Disable form during submission
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registering...';
+            form.classList.add('loading');
+
+            try {
+                console.log('Creating user with Firebase Auth...');
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                console.log('✅ User created successfully:', userCredential.user.uid);
+
+                // Update user profile
+                await userCredential.user.updateProfile({ 
+                    displayName: name 
+                });
+                console.log('✅ Profile updated');
+
+                // Save admin data to database
+                await database.ref('admins/' + userCredential.user.uid).set({
+                    name: name,
+                    email: email,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                });
+                console.log('✅ Admin data saved to database');
+
+                showAlertInContainer('Registration successful! Welcome, ' + name, 'success', 'registerAlert');
+                
+                // Clear form
+                form.reset();
+                
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                let errorMessage = 'Registration failed: ';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage += 'This email is already registered.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage += 'Password should be at least 6 characters.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += 'Invalid email address.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage += 'Network error. Check your internet connection.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                showAlertInContainer(errorMessage, 'danger', 'registerAlert');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                form.classList.remove('loading');
+            }
+        });
+
+        // Login Handler
+        document.getElementById('loginFormEl').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            if (!firebaseInitialized) {
+                showAlertInContainer('Firebase is not initialized. Please refresh the page.', 'danger', 'loginAlert');
+                return;
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            const form = event.target;
+            
+            // Get form values
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            console.log('Login form submitted:', { email });
+
+            // Disable form during submission
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            form.classList.add('loading');
+
+            try {
+                console.log('Signing in with Firebase Auth...');
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ User signed in successfully:', userCredential.user.uid);
+
+                // Log the login activity
+                await database.ref('loginLogs').push({
+                    adminId: userCredential.user.uid,
+                    adminEmail: email,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    date: new Date().toISOString()
+                });
+                console.log('✅ Login logged to database');
+
+                showAlertInContainer('Login successful! Welcome back.', 'success', 'loginAlert');
+                
+                // Clear form
+                form.reset();
+                
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                let errorMessage = 'Login failed: ';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage += 'No account found with this email.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage += 'Incorrect password.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += 'Invalid email address.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage += 'This account has been disabled.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage += 'Too many failed attempts. Try again later.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage += 'Network error. Check your internet connection.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                showAlertInContainer(errorMessage, 'danger', 'loginAlert');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+                form.classList.remove('loading');
+            }
+        });
+
+        // Logout Handler
+        async function handleLogout() {
+            if (!firebaseInitialized || !auth) {
+                showAlert('Cannot logout - Firebase not initialized', 'danger');
+                return;
+            }
+
+            try {
+                console.log('Logging out...');
+                await auth.signOut();
+                currentAdmin = null;
+                showAlert('Logged out successfully', 'info');
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                showAlert('Error logging out: ' + error.message, 'danger');
+            }
+        }
+
+        // Check Sensor Connection (via ESP8266 /status)
+        const ESP_IP = "http://10.3.10.10";
+
+        async function checkSensorConnection() {
+            const indicator = document.getElementById('sensorIndicator');
+            const status = document.getElementById('sensorStatus');
+
+            status.textContent = 'Checking sensor connection...';
+            console.log('Checking ESP8266 connection');
+
+            try {
+                const res = await fetch(`${ESP_IP}/status`);
+                if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+                const data = await res.json();
+
+                if (data.sensorConnected) {
+                    sensorConnected = true;
+                    indicator.className = 'status-indicator status-connected';
+                    status.textContent = '✅ Sensor connected and ready';
+                } else {
+                    sensorConnected = false;
+                    indicator.className = 'status-indicator status-disconnected';
+                    status.textContent = '❌ Sensor not detected';
+                }
+            } catch (err) {
+                sensorConnected = false;
+                indicator.className = 'status-indicator status-disconnected';
+                status.textContent = '⚠️ Cannot reach ESP8266';
+                console.error('Sensor check error:', err.message);
+            }
+        }
+
+        // Start Fingerprint Enrollment
+        async function startFingerprintScan() {
+            if (!sensorConnected) {
+                showAlert('Please connect the fingerprint sensor first!', 'danger');
+                return;
+            }
+
+            const empId = document.getElementById('empId').value.trim();
+            if (!empId) {
+                showAlert('Enter Employee ID first before scanning!', 'danger');
+                return;
+            }
+
+            const scanner = document.getElementById('fingerprintScanner');
+            const scanStatus = document.getElementById('scanStatus');
+            const enrollBtn = document.getElementById('enrollBtn');
+
+            scanner.classList.add('scanning');
+            scanStatus.textContent = 'Starting fingerprint enrollment...';
+            console.log('Starting enrollment for ID:', empId);
+
+            try {
+                // Step 1: Start enrollment
+                let res = await fetch(`${ESP_IP}/enroll/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fingerprintId: `FP_${empId}` })
+                });
+                if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+                let data = await res.json();
+
+                if (!data.success) {
+                    scanner.classList.remove('scanning');
+                    showAlert('Failed to start enrollment: ' + (data.error || 'Unknown error'), 'danger');
+                    console.error('Enrollment start error:', data.error);
+                    return;
+                }
+
+                console.log('Enrollment started:', data);
+
+                // Step 2: Poll enrollment status
+                let finished = false;
+                while (!finished) {
+                    await new Promise(r => setTimeout(r, 2000));
+                    res = await fetch(`${ESP_IP}/enroll/status`);
+                    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+                    data = await res.json();
+
+                    scanStatus.textContent = `👉 ${data.status}`;
+                    console.log('Enrollment status:', data.status);
+
+                    if (data.status === 'success') {
+                        scanner.classList.remove('scanning');
+                        scanStatus.textContent = '✅ Fingerprint captured successfully!';
+                        fingerprintData = empId;
+                        enrollBtn.disabled = false;
+                        showAlert('Fingerprint captured successfully!', 'success');
+                        finished = true;
+                    } else if (data.status === 'error_converting' || 
+                              data.status === 'error_storing' || 
+                              data.status === 'mismatch' || 
+                              data.status === 'error_creating_model' ||
+                              data.status === 'error_converting_2') {
+                        scanner.classList.remove('scanning');
+                        scanStatus.textContent = `❌ ${data.status}`;
+                        showAlert(`Enrollment failed: ${data.status}`, 'danger');
+                        finished = true;
+                    } else if (data.status === 'error_imaging') {
+                        scanStatus.textContent = '❌ Place finger properly';
+                    } else if (data.error === 'Fingerprint ID already exists') {
+                        scanner.classList.remove('scanning');
+                        scanStatus.textContent = '❌ Fingerprint already registered!';
+                        showAlert('This fingerprint is already registered!', 'danger');
+                        enrollBtn.disabled = true;
+                        finished = true;
+                    }
+                }
+            } catch (err) {
+                scanner.classList.remove('scanning');
+                scanStatus.textContent = '⚠️ Error communicating with ESP';
+                showAlert('Error communicating with ESP8266: ' + err.message, 'danger');
+                console.error('Enrollment error:', err.message);
+            }
+        }
+
+        // Add Employee Handler
+        async function handleAddEmployee(event) {
+            event.preventDefault();
+            console.log('Add employee form submitted');
+            
+            if (!fingerprintData) {
+                showAlert('Please scan fingerprint first!', 'danger');
+                return;
+            }
+
+            if (!firebaseInitialized) {
+                showAlert('Firebase is not initialized. Please refresh the page.', 'danger');
+                return;
+            }
+
+            const name = document.getElementById('empName').value;
+            const role = document.getElementById('empRole').value;
+            const empId = document.getElementById('empId').value;
+
+            try {
+                console.log('Saving employee to Firebase:', { name, role, empId });
+                await database.ref('employees').push({
+                    name: name,
+                    role: role,
+                    employeeId: empId,
+                    fingerprintId: fingerprintData,
+                    enrolledBy: currentAdmin.email,
+                    enrolledAt: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                showAlert('Employee enrolled successfully!', 'success');
+                
+                // Reset form
+                document.getElementById('empName').value = '';
+                document.getElementById('empRole').value = '';
+                document.getElementById('empId').value = '';
+                document.getElementById('scanStatus').textContent = 'Click below to start scanning';
+                document.getElementById('enrollBtn').disabled = true;
+                fingerprintData = null;
+                
+                loadEmployees();
+            } catch (error) {
+                console.error('Employee enrollment error:', error.message);
+                showAlert('Error enrolling employee: ' + error.message, 'danger');
+            }
+        }
+
+        // Load Login Logs
+        async function loadLoginLogs() {
+            if (!firebaseInitialized) {
+                return;
+            }
+
+            const logsContainer = document.getElementById('loginLogs');
+            logsContainer.innerHTML = '<div class="loader"></div>';
+            console.log('Loading login logs');
+
+            try {
+                const snapshot = await database.ref('loginLogs')
+                    .orderByChild('timestamp')
+                    .limitToLast(20)
+                    .once('value');
+
+                const logs = [];
+                snapshot.forEach((child) => {
+                    logs.push(child.val());
+                });
+
+                if (logs.length === 0) {
+                    logsContainer.innerHTML = '<p style="text-align: center; color: #666;">No login activity today</p>';
+                } else {
+                    logsContainer.innerHTML = '';
+                    logs.reverse().forEach(log => {
+                        const date = new Date(log.timestamp);
+                        const today = new Date();
+                        
+                        if (date.toDateString() === today.toDateString()) {
+                            const logEntry = document.createElement('div');
+                            logEntry.className = 'log-entry';
+                            logEntry.innerHTML = `
+                                <div>
+                                    <strong>${log.adminEmail}</strong>
+                                    <br>
+                                    <small>Admin Login</small>
+                                </div>
+                                <div>
+                                    ${date.toLocaleTimeString()}
+                                </div>
+                            `;
+                            logsContainer.appendChild(logEntry);
+                        }
+                    });
+
+                    if (logsContainer.children.length === 0) {
+                        logsContainer.innerHTML = '<p style="text-align: center; color: #666;">No login activity today</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading login logs:', error.message);
+                logsContainer.innerHTML = '<p style="text-align: center; color: #d9534f;">Error loading logs</p>';
+            }
+        }
+
+        // Load Employees
+        async function loadEmployees() {
+            if (!firebaseInitialized) {
+                return;
+            }
+
+            const tableBody = document.getElementById('employeeTableBody');
+            tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;"><div class="loader"></div></td></tr>';
+            console.log('Loading employees');
+
+            try {
+                const snapshot = await database.ref('employees').once('value');
+                const employees = [];
+                
+                snapshot.forEach((child) => {
+                    employees.push({
+                        id: child.key,
+                        ...child.val()
+                    });
+                });
+
+                if (employees.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">No employees enrolled yet</td></tr>';
+                } else {
+                    tableBody.innerHTML = '';
+                    employees.forEach(emp => {
+                        const row = document.createElement('tr');
+                        const enrolledDate = new Date(emp.enrolledAt).toLocaleDateString();
+                        row.innerHTML = `
+                            <td>${emp.employeeId}</td>
+                            <td>${emp.name}</td>
+                            <td>${emp.role}</td>
+                            <td>${emp.fingerprintId}</td>
+                            <td>${enrolledDate}</td>
+                            <td>
+                                <button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="deleteEmployee('${emp.id}')">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading employees:', error.message);
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #d9534f;">Error loading employees</td></tr>';
+            }
+        }
+
+        // Delete Employee
+        async function deleteEmployee(employeeId) {
+            console.log('Deleting employee:', employeeId);
+            if (confirm('Are you sure you want to delete this employee?')) {
+                try {
+                    await database.ref('employees/' + employeeId).remove();
+                    showAlert('Employee deleted successfully', 'success');
+                    loadEmployees();
+                } catch (error) {
+                    console.error('Error deleting employee:', error.message);
+                    showAlert('Error deleting employee: ' + error.message, 'danger');
+                }
+            }
+        }
+
+        // Show Alert in specific container
+        function showAlertInContainer(message, type, containerId) {
+            console.log('Showing alert in container:', containerId, message, type);
+            const container = document.getElementById(containerId);
+            if (container) {
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                container.innerHTML = '';
+                container.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
+        }
+
+        // Show Alert (general)
+        function showAlert(message, type) {
+            console.log('Showing alert:', message, type);
+            const alertContainer = document.getElementById('alertContainer') || document.querySelector('.container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            if (alertContainer.id === 'alertContainer') {
+                alertContainer.innerHTML = '';
+                alertContainer.appendChild(alert);
+            } else {
+                alertContainer.insertBefore(alert, alertContainer.firstChild);
+            }
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Debug function to test Firebase connection
+        function testFirebaseConnection() {
+            console.log('Testing Firebase connection...');
+            console.log('Firebase app:', app);
+            console.log('Firebase auth:', auth);
+            console.log('Firebase database:', database);
+            
+            if (database) {
+                database.ref('.info/connected').on('value', (snapshot) => {
+                    if (snapshot.val() === true) {
+                        console.log('✅ Connected to Firebase Database');
+                    } else {
+                        console.log('❌ Disconnected from Firebase Database');
+                    }
+                });
+            }
+        }
+
+        // Call test function after page loads (for debugging)
+        window.addEventListener('load', () => {
+            setTimeout(testFirebaseConnection, 2000);
+        });
+    </script>
+</body>
+</html>
