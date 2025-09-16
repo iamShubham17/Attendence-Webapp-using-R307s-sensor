@@ -1,0 +1,26 @@
+{
+  "name": "attendanceappr307s",
+  "version": "1.0.0",
+  "description": "A biometric attendance system using the ESP8266 and R307 Fingerprint Sensor, integrated with a Firebase-powered Web Dashboard. This project enables secure attendance management with fingerprint enrollment, scanning, and real-time employee logs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "live-server --port=9090"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamShubham17/Attendence-Webapp-using-R307s-sensor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/iamShubham17/Attendence-Webapp-using-R307s-sensor/issues"
+  },
+  "homepage": "https://github.com/iamShubham17/Attendence-Webapp-using-R307s-sensor#readme",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
