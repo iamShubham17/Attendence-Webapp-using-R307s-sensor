@@ -17,11 +17,11 @@
 #include <ArduinoJson.h>
 
 // WiFi credentials
-const char* ssid = "DSPD LAB-2.4G";
-const char* password = "dspd@4321";
+const char* ssid = "Happy Home";
+const char* password = "Giradkar@1717";
 
 // Software Serial: RX=D2(GPIO4), TX=D1(GPIO5)
-SoftwareSerial mySerial(4, 5); // RX=4, TX=5
+SoftwareSerial mySerial(6, 5); // RX=4, TX=5
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
 ESP8266WebServer server(80);
