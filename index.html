@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,15 +33,17 @@
             --glow: 0 0 30px rgba(102, 126, 234, 0.3);
         }
 
-      body {
-    font-family: 'Inter', sans-serif;
-    background: var(--dark) url('12.jpg') no-repeat center center fixed;
-    background-size: cover; /* makes the image cover the entire screen */
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark) url('12.jpg') no-repeat center center fixed;
+            background-size: cover;
+            /* makes the image cover the entire screen */
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+
+        }
 
         /* Animated Background */
         body::before {
@@ -50,7 +53,7 @@
             left: 0;
             width: 200%;
             height: 200%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.2) 0%, transparent 50%);
@@ -71,9 +74,19 @@
         }
 
         @keyframes backgroundMove {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(-5%, -10%) rotate(1deg); }
-            66% { transform: translate(5%, 10%) rotate(-1deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(-5%, -10%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(5%, 10%) rotate(-1deg);
+            }
         }
 
         .container {
@@ -102,13 +115,18 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             animation: shimmer 3s infinite;
         }
 
         @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
         }
 
         /* Authentication Section */
@@ -153,8 +171,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .form-group {
@@ -229,7 +254,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.6s;
         }
 
@@ -239,7 +264,7 @@
 
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: var(--glow), 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: var(--glow), 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .btn:active {
@@ -390,6 +415,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -516,6 +542,7 @@
                 transform: scale(1);
                 opacity: 1;
             }
+
             100% {
                 transform: scale(1.5);
                 opacity: 0;
@@ -585,8 +612,13 @@
         }
 
         @keyframes scanProgress {
-            0% { stroke-dashoffset: 628; }
-            100% { stroke-dashoffset: 0; }
+            0% {
+                stroke-dashoffset: 628;
+            }
+
+            100% {
+                stroke-dashoffset: 0;
+            }
         }
 
         /* Tables */
@@ -748,8 +780,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Hidden class */
@@ -808,13 +845,16 @@
                 opacity: 0;
                 transform: scale(0.3) translateY(50px);
             }
+
             50% {
                 opacity: 1;
                 transform: scale(1.05) translateY(-10px);
             }
+
             70% {
                 transform: scale(0.9) translateY(0);
             }
+
             100% {
                 opacity: 1;
                 transform: scale(1) translateY(0);
@@ -834,7 +874,9 @@
         }
     </style>
 </head>
+
 <body>
+
     <div class="container">
         <!-- Authentication Section -->
         <div id="authSection" class="auth-section">
@@ -845,10 +887,10 @@
                     <h1>IdentifyPro</h1>
                     <p style="color: var(--text-secondary); margin-top: 10px;">Premium Biometric Access</p>
                 </div>
-                
+
                 <h2 style="margin-bottom: 40px; color: var(--text-primary);">Create Account</h2>
                 <div id="registerAlert"></div>
-                
+
                 <form id="registerFormEl">
                     <div class="form-group">
                         <div class="input-container">
@@ -865,14 +907,15 @@
                     <div class="form-group">
                         <div class="input-container">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="regPassword" placeholder="Password (6+ characters)" required minlength="6">
+                            <input type="password" id="regPassword" placeholder="Password (6+ characters)" required
+                                minlength="6">
                         </div>
                     </div>
                     <button type="submit" class="btn" id="registerBtn">
                         <span>Create Account</span>
                     </button>
                 </form>
-                
+
                 <div class="switch-auth">
                     Already have an account? <a href="#" onclick="showLogin()">Sign In</a>
                 </div>
@@ -885,10 +928,10 @@
                     <h1>IdentifyPro</h1>
                     <p style="color: var(--text-secondary); margin-top: 10px;">Premium Biometric Access</p>
                 </div>
-                
+
                 <h2 style="margin-bottom: 40px; color: var(--text-primary);">Welcome Back</h2>
                 <div id="loginAlert"></div>
-                
+
                 <form id="loginFormEl">
                     <div class="form-group">
                         <div class="input-container">
@@ -906,7 +949,7 @@
                         <span>Sign In</span>
                     </button>
                 </form>
-                
+
                 <div class="switch-auth">
                     Don't have an account? <a href="#" onclick="showRegister()">Create Account</a>
                 </div>
@@ -933,7 +976,8 @@
                 <div class="user-info">
                     <div class="user-avatar" id="userAvatar">A</div>
                     <span id="currentUser">Admin</span>
-                    <button class="btn btn-danger" style="width: auto; padding: 10px 20px; font-size: 14px;" onclick="handleLogout()">
+                    <button class="btn btn-danger" style="width: auto; padding: 10px 20px; font-size: 14px;"
+                        onclick="handleLogout()">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </div>
@@ -954,7 +998,7 @@
                         <div class="stat-number" id="totalEmployees">0</div>
                         <div class="stat-label">Total Employees</div>
                     </div>
-                    
+
                     <div class="glass-card stat-card bounce-in" style="animation-delay: 0.1s;">
                         <div class="stat-icon">
                             <i class="fas fa-sign-in-alt"></i>
@@ -962,7 +1006,7 @@
                         <div class="stat-number" id="todayLogins">0</div>
                         <div class="stat-label">Today's Logins</div>
                     </div>
-                    
+
                     <div class="glass-card stat-card bounce-in" style="animation-delay: 0.2s;">
                         <div class="stat-icon">
                             <i class="fas fa-shield-alt"></i>
@@ -999,7 +1043,7 @@
                         <i class="fas fa-sync-alt"></i> Refresh Status
                     </button>
                 </div>
-                
+
                 <div class="glass-card" style="padding: 50px;">
                     <form onsubmit="handleAddEmployee(event)">
                         <div class="form-group">
@@ -1020,7 +1064,7 @@
                                 <input type="text" id="empId" placeholder="Employee ID" required>
                             </div>
                         </div>
-                        
+
                         <div class="glass-card fingerprint-scanner" id="fingerprintScanner">
                             <div class="scan-progress" id="scanProgress">
                                 <svg class="progress-ring" width="200" height="200">
@@ -1037,19 +1081,21 @@
                                     <i class="fas fa-fingerprint" style="font-size: 3rem; color: #667eea;"></i>
                                 </div>
                             </div>
-                            
+
                             <div id="scannerDefault">
                                 <div class="fingerprint-icon">
                                     <i class="fas fa-fingerprint"></i>
                                 </div>
                                 <h3 style="margin-bottom: 15px; color: var(--text-primary);">Biometric Scanner</h3>
-                                <p id="scanStatus" style="color: var(--text-secondary); margin-bottom: 30px;">Click below to start fingerprint enrollment</p>
-                                <button type="button" class="btn btn-success" style="margin-top: 20px;" onclick="startFingerprintScan()">
+                                <p id="scanStatus" style="color: var(--text-secondary); margin-bottom: 30px;">Click
+                                    below to start fingerprint enrollment</p>
+                                <button type="button" class="btn btn-success" style="margin-top: 20px;"
+                                    onclick="startFingerprintScan()">
                                     <i class="fas fa-play"></i> Start Fingerprint Scan
                                 </button>
                             </div>
                         </div>
-                        
+
                         <button type="submit" class="btn glow-effect" id="enrollBtn" disabled>
                             <i class="fas fa-user-check"></i> Enroll Employee
                         </button>
@@ -1096,16 +1142,16 @@
 
     <script>
         // Firebase Configuration
-       const firebaseConfig = {
-                apiKey: "AIzaSyAeJTSidwzwmZ9t6I3b9Zhzgb6g80ZpSCo",
-                authDomain: "identify-53b1f.firebaseapp.com",
-                databaseURL: "https://identify-53b1f-default-rtdb.asia-southeast1.firebasedatabase.app",
-                projectId: "identify-53b1f",
-                storageBucket: "identify-53b1f.firebasestorage.app",
-                messagingSenderId: "636421880671",
-                appId: "1:636421880671:web:3bca2977ee08f207e994ea",
-                measurementId: "G-JZDR1MPJET"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAeJTSidwzwmZ9t6I3b9Zhzgb6g80ZpSCo",
+            authDomain: "identify-53b1f.firebaseapp.com",
+            databaseURL: "https://identify-53b1f-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "identify-53b1f",
+            storageBucket: "identify-53b1f.firebasestorage.app",
+            messagingSenderId: "636421880671",
+            appId: "1:636421880671:web:3bca2977ee08f207e994ea",
+            measurementId: "G-JZDR1MPJET"
+        };
 
         let app, auth, database;
         let currentAdmin = null;
@@ -1120,13 +1166,13 @@
                 app = firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 database = firebase.database();
-                
+
                 // Test database connection
                 await database.ref('.info/connected').once('value');
-                
+
                 firebaseInitialized = true;
                 console.log('✅ Firebase initialized successfully');
-                
+
                 // Set up auth state listener
                 auth.onAuthStateChanged((user) => {
                     console.log('Auth state changed:', user ? user.email : 'No user');
@@ -1137,7 +1183,7 @@
                         showAuth();
                     }
                 });
-                
+
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
                 firebaseInitialized = false;
@@ -1173,13 +1219,13 @@
             console.log('Showing dashboard');
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
-            
+
             if (currentAdmin) {
                 const userName = currentAdmin.displayName || currentAdmin.email || 'Admin';
                 document.getElementById('currentUser').textContent = userName;
                 document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
             }
-            
+
             loadLoginLogs();
             loadEmployees();
             checkSensorConnection();
@@ -1226,12 +1272,12 @@
                 const employeesSnapshot = await database.ref('employees').once('value');
                 let employeeCount = 0;
                 employeesSnapshot.forEach(() => employeeCount++);
-                
+
                 // Count today's logins
                 const loginSnapshot = await database.ref('loginLogs').once('value');
                 let todayLogins = 0;
                 const today = new Date().toDateString();
-                
+
                 loginSnapshot.forEach((child) => {
                     const log = child.val();
                     if (log.timestamp) {
@@ -1269,9 +1315,9 @@
         }
 
         // Registration Handler
-        document.getElementById('registerFormEl').addEventListener('submit', async function(event) {
+        document.getElementById('registerFormEl').addEventListener('submit', async function (event) {
             event.preventDefault();
-            
+
             if (!firebaseInitialized) {
                 showAlertInContainer('Firebase is not initialized. Please refresh the page.', 'danger', 'registerAlert');
                 return;
@@ -1279,7 +1325,7 @@
 
             const registerBtn = document.getElementById('registerBtn');
             const form = event.target;
-            
+
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
@@ -1307,11 +1353,11 @@
 
                 showAlertInContainer('Account created successfully! Welcome, ' + name, 'success', 'registerAlert');
                 form.reset();
-                
+
             } catch (error) {
                 console.error('❌ Registration error:', error);
                 let errorMessage = 'Registration failed: ';
-                
+
                 switch (error.code) {
                     case 'auth/email-already-in-use':
                         errorMessage += 'This email is already registered.';
@@ -1325,7 +1371,7 @@
                     default:
                         errorMessage += error.message;
                 }
-                
+
                 showAlertInContainer(errorMessage, 'danger', 'registerAlert');
             } finally {
                 registerBtn.disabled = false;
@@ -1335,9 +1381,9 @@
         });
 
         // Login Handler
-        document.getElementById('loginFormEl').addEventListener('submit', async function(event) {
+        document.getElementById('loginFormEl').addEventListener('submit', async function (event) {
             event.preventDefault();
-            
+
             if (!firebaseInitialized) {
                 showAlertInContainer('Firebase is not initialized. Please refresh the page.', 'danger', 'loginAlert');
                 return;
@@ -1345,7 +1391,7 @@
 
             const loginBtn = document.getElementById('loginBtn');
             const form = event.target;
-            
+
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
@@ -1370,11 +1416,11 @@
 
                 showAlertInContainer('Login successful! Welcome back.', 'success', 'loginAlert');
                 form.reset();
-                
+
             } catch (error) {
                 console.error('❌ Login error:', error);
                 let errorMessage = 'Login failed: ';
-                
+
                 switch (error.code) {
                     case 'auth/user-not-found':
                         errorMessage += 'No account found with this email.';
@@ -1388,7 +1434,7 @@
                     default:
                         errorMessage += error.message;
                 }
-                
+
                 showAlertInContainer(errorMessage, 'danger', 'loginAlert');
             } finally {
                 loginBtn.disabled = false;
@@ -1416,19 +1462,22 @@
         }
 
         // Check Sensor Connection
-        const ESP_IP = "http://10.3.10.10";
+        // Check Sensor Connection
+        const ESP_IP = "http://192.168.31.197";  // ← YOUR ACTUAL ESP IP!
 
         async function checkSensorConnection() {
             const indicator = document.getElementById('sensorIndicator');
             const status = document.getElementById('sensorStatus');
 
             status.textContent = 'Checking sensor connection...';
-            console.log('Checking ESP8266 connection');
+            console.log('Checking ESP8266 at:', ESP_IP);
 
             try {
                 const res = await fetch(`${ESP_IP}/status`);
-                if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
                 const data = await res.json();
+
+                console.log('✅ ESP Response:', data);  // Debug log
 
                 if (data.sensorConnected) {
                     sensorConnected = true;
@@ -1437,16 +1486,16 @@
                 } else {
                     sensorConnected = false;
                     indicator.className = 'status-dot status-disconnected';
-                    status.textContent = '❌ Biometric sensor not detected';
+                    status.textContent = `❌ Sensor issue: ${data.error || 'Not detected'}`;
                 }
             } catch (err) {
                 sensorConnected = false;
                 indicator.className = 'status-dot status-disconnected';
-                status.textContent = '⚠️ Cannot reach biometric module';
-                console.error('Sensor check error:', err.message);
+                status.textContent = '⚠️ Cannot reach ESP8266 module';
+                console.error('ESP Connection Error:', err.message);
+                console.log('💡 Make sure ESP is on same WiFi network as this browser');
             }
         }
-
         // Start Fingerprint Enrollment
         async function startFingerprintScan() {
             if (!sensorConnected) {
@@ -1471,7 +1520,7 @@
             scanProgress.classList.add('active');
             scanner.classList.add('scanning');
             scanStatus.textContent = 'Starting biometric enrollment...';
-            
+
             console.log('Starting enrollment for ID:', empId);
 
             try {
@@ -1512,11 +1561,11 @@
                         enrollBtn.classList.add('glow-effect');
                         showAlert('Biometric data captured successfully!', 'success');
                         finished = true;
-                    } else if (data.status === 'error_converting' || 
-                              data.status === 'error_storing' || 
-                              data.status === 'mismatch' || 
-                              data.status === 'error_creating_model' ||
-                              data.status === 'error_converting_2') {
+                    } else if (data.status === 'error_converting' ||
+                        data.status === 'error_storing' ||
+                        data.status === 'mismatch' ||
+                        data.status === 'error_creating_model' ||
+                        data.status === 'error_converting_2') {
                         resetScanner();
                         scanStatus.textContent = `❌ ${data.status}`;
                         showAlert(`Enrollment failed: ${data.status}`, 'danger');
@@ -1540,7 +1589,7 @@
             const scanner = document.getElementById('fingerprintScanner');
             const scanProgress = document.getElementById('scanProgress');
             const scannerDefault = document.getElementById('scannerDefault');
-            
+
             scanner.classList.remove('scanning');
             scanProgress.classList.remove('active');
             scannerDefault.style.display = 'block';
@@ -1550,7 +1599,7 @@
         async function handleAddEmployee(event) {
             event.preventDefault();
             console.log('Add employee form submitted');
-            
+
             if (!fingerprintData) {
                 showAlert('Please scan biometric data first!', 'danger');
                 return;
@@ -1581,7 +1630,7 @@
                 });
 
                 showAlert('Employee enrolled successfully!', 'success');
-                
+
                 // Reset form
                 document.getElementById('empName').value = '';
                 document.getElementById('empRole').value = '';
@@ -1591,7 +1640,7 @@
                 enrollBtn.classList.remove('glow-effect');
                 enrollBtn.innerHTML = '<i class="fas fa-user-check"></i> Enroll Employee';
                 fingerprintData = null;
-                
+
                 loadEmployees();
                 updateStats();
             } catch (error) {
@@ -1628,7 +1677,7 @@
                     logs.reverse().forEach((log, index) => {
                         const date = new Date(log.timestamp);
                         const today = new Date();
-                        
+
                         if (date.toDateString() === today.toDateString()) {
                             const logEntry = document.createElement('div');
                             logEntry.className = 'log-entry animate-in';
@@ -1669,7 +1718,7 @@
             try {
                 const snapshot = await database.ref('employees').once('value');
                 const employees = [];
-                
+
                 snapshot.forEach((child) => {
                     employees.push({
                         id: child.key,
@@ -1745,7 +1794,7 @@
                 `;
                 container.innerHTML = '';
                 container.appendChild(alert);
-                
+
                 setTimeout(() => {
                     if (alert.parentNode) {
                         alert.style.opacity = '0';
@@ -1768,14 +1817,14 @@
                     <span>${message}</span>
                 </div>
             `;
-            
+
             if (alertContainer.id === 'alertContainer') {
                 alertContainer.innerHTML = '';
                 alertContainer.appendChild(alert);
             } else {
                 alertContainer.insertBefore(alert, alertContainer.firstChild);
             }
-            
+
             setTimeout(() => {
                 if (alert.parentNode) {
                     alert.style.opacity = '0';
@@ -1791,12 +1840,12 @@
                 const cards = document.querySelectorAll('.glass-card');
                 const mouseX = e.clientX / window.innerWidth;
                 const mouseY = e.clientY / window.innerHeight;
-                
+
                 cards.forEach((card, index) => {
                     const offsetX = (mouseX - 0.5) * 20;
                     const offsetY = (mouseY - 0.5) * 20;
                     const delay = index * 0.1;
-                    
+
                     setTimeout(() => {
                         card.style.transform = `translate(${offsetX}px, ${offsetY}px) rotateX(${offsetY * 0.1}deg) rotateY(${offsetX * 0.1}deg)`;
                     }, delay * 1000);
@@ -1808,10 +1857,10 @@
         function initializeAdvancedEffects() {
             // Add floating particles effect
             createFloatingParticles();
-            
+
             // Add parallax mouse tracking
             addParallaxEffect();
-            
+
             // Add typing effect to headings
             addTypingEffect();
         }
@@ -1831,7 +1880,7 @@
                 particle.style.top = Math.random() * 100 + 'vh';
                 particle.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
                 container.appendChild(particle);
-                
+
                 setTimeout(() => particle.remove(), 15000);
             }
         }
@@ -1842,7 +1891,7 @@
                 const text = heading.textContent;
                 heading.textContent = '';
                 let i = 0;
-                
+
                 const typeWriter = () => {
                     if (i < text.length) {
                         heading.textContent += text.charAt(i);
@@ -1850,7 +1899,7 @@
                         setTimeout(typeWriter, 100);
                     }
                 };
-                
+
                 // Start typing effect when element comes into view
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -1860,7 +1909,7 @@
                         }
                     });
                 });
-                
+
                 observer.observe(heading);
             });
         }
@@ -1868,12 +1917,12 @@
         // Enhanced form validation with premium effects
         function addPremiumFormValidation() {
             const inputs = document.querySelectorAll('input');
-            
+
             inputs.forEach(input => {
-                input.addEventListener('blur', function() {
+                input.addEventListener('blur', function () {
                     const container = this.closest('.input-container');
                     const isValid = this.validity.valid && this.value.trim() !== '';
-                    
+
                     if (isValid) {
                         container.style.borderColor = '#10b981';
                         container.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.3)';
@@ -1889,33 +1938,33 @@
         function playSound(type) {
             // Create audio context for UI sounds
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
+
             let frequency;
-            switch(type) {
+            switch (type) {
                 case 'success': frequency = 800; break;
                 case 'error': frequency = 300; break;
                 case 'click': frequency = 600; break;
                 default: frequency = 500;
             }
-            
+
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.value = frequency;
             oscillator.type = 'sine';
-            
+
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            
+
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.3);
         }
 
         // Add click sound to buttons
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.matches('.btn, .nav-link')) {
                 playSound('click');
             }
@@ -1926,7 +1975,7 @@
             const originalHTML = element.innerHTML;
             element.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${loadingText}`;
             element.disabled = true;
-            
+
             return () => {
                 element.innerHTML = originalHTML;
                 element.disabled = false;
@@ -1944,7 +1993,7 @@
         // Add keyboard shortcuts for power users
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
+                switch (e.key) {
                     case '1':
                         e.preventDefault();
                         showTab('home');
@@ -1978,7 +2027,7 @@
                     }
                 }
             });
-            
+
             observer.observe({ entryTypes: ['measure'] });
         }
 
@@ -1991,4 +2040,5 @@
         console.log('⚡ Performance Monitoring Active');
     </script>
 </body>
+
 </html>
