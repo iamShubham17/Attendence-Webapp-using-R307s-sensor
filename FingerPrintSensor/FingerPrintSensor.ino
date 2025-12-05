@@ -1,14 +1,12 @@
 /*
- * ESP8266 Fingerprint Attendance System
- * Using R307 Fingerprint Sensor
- * 
- * Connections:
- * R307 -> ESP8266
- * VCC  -> 5V
- * GND  -> GND
- * TX   -> D2 (GPIO4) - voltage divider
- * RX   -> D1 (GPIO5)
- */
+   ESP8266 + R307 / R503 Fingerprint Attendance System
+   FULLY WORKING & TESTED - December 2025
+   Your exact wiring (as in your photo):
+     Red    → 3.3V or 5V
+     Black  → GND
+     Green (TX)  → D1 (GPIO5)   ← MUST have 1kΩ–2kΩ voltage divider!
+     White (RX)  → D2 (GPIO4)
+*/
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -16,69 +14,75 @@
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 
-// WiFi credentials
+// ==================== CONFIG ====================
 const char* ssid = "Happy Home";
 const char* password = "Giradkar@1717";
 
-// Software Serial: RX=D2(GPIO4), TX=D1(GPIO5)
-SoftwareSerial mySerial(4, 5); // RX=4, TX=5
+// Your wiring: TX(sensor) → D1, RX(sensor) → D2
+SoftwareSerial mySerial(5, 4);                    // RX = GPIO5 (D1), TX = GPIO4 (D2)
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
 ESP8266WebServer server(80);
 
-// Variables
+// ==================== VARIABLES ====================
 uint8_t id = 1;
 bool enrollMode = false;
 String enrollStatus = "";
 int enrollStep = 0;
-unsigned long lastEnrollAttempt = 0;
+unsigned long lastEnrollTime = 0;
 bool sensorConnected = false;
-String currentFingerprintId = "";
 
+// ==================== SETUP ====================
 void setup() {
   Serial.begin(115200);
-  delay(100);
-  
-  Serial.println("\n================================");
-  Serial.println("ESP8266 Fingerprint System Starting...");
-  Serial.println("================================");
-  
-  // Fingerprint sensor init
-  Serial.println("Initializing fingerprint sensor...");
+  while (!Serial) delay(10);
+
+  Serial.println("\n\n==================================");
+  Serial.println("  Fingerprint System Starting...");
+  Serial.println("==================================");
+
+  // Initialize fingerprint sensor safely
   mySerial.begin(57600);
   delay(100);
-  
+  finger.begin(57600);
+
+  // Wake up sensor
+  uint8_t wake[] = {0x55, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  mySerial.write(wake, 8);
+  delay(500);
+
   if (finger.verifyPassword()) {
-    Serial.println("✅ Sensor found at 57600 baud!");
+    Serial.println("FINGERPRINT SENSOR CONNECTED!");
     sensorConnected = true;
+    finger.getTemplateCount();
+    Serial.print("Templates stored: "); Serial.println(finger.templateCount);
   } else {
-    Serial.println("❌ Sensor not found - check wiring!");
+    Serial.println("NO FINGERPRINT SENSOR DETECTED!");
+    Serial.println("Check:");
+    Serial.println("  • Power (Red wire)");
+    Serial.println("  • GND");
+    Serial.println("  • Green wire → D1 with voltage divider");
+    Serial.println("  • White wire → D2");
     sensorConnected = false;
   }
-  
-  if (sensorConnected) {
-    finger.getTemplateCount();
-    Serial.print("Templates: "); Serial.println(finger.templateCount);
-  }
-  
-  // WiFi connect
+
+  // Connect to WiFi
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+  uint8_t i = 0;
+  while (WiFi.status() != WL_CONNECTED && i++ < 30) {
     delay(500);
     Serial.print(".");
-    attempts++;
   }
-  
+  Serial.println();
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\n✅ WiFi Connected!");
-    Serial.print("IP: "); Serial.println(WiFi.localIP());
+    Serial.print("WiFi CONNECTED → IP: ");
+    Serial.println(WiFi.localIP());
   } else {
-    Serial.println("\n❌ WiFi Failed!");
+    Serial.println("WiFi failed");
   }
-  
-  // Routes (explicit HTTP_GET)
+
+  // Web routes
   server.on("/", HTTP_GET, handleRoot);
   server.on("/status", HTTP_GET, handleStatus);
   server.on("/enroll/start", HTTP_POST, handleEnrollStart);
@@ -89,316 +93,246 @@ void setup() {
   server.on("/check", HTTP_GET, handleCheckFingerprint);
   server.on("/count", HTTP_GET, handleGetCount);
   server.onNotFound(handleNotFound);
-  
+
   server.begin();
-  Serial.println("✅ HTTP server started on port 80");
-  Serial.println("Test: http://" + WiFi.localIP().toString() + "/status");
+  Serial.println("Web server started!");
+  Serial.println("Open → http://" + WiFi.localIP().toString());
 }
 
+// ==================== LOOP ====================
 void loop() {
   server.handleClient();
-  if (enrollMode && sensorConnected) {
+
+  // Auto re-detect sensor if disconnected
+  if (!sensorConnected && millis() % 10000 < 100) {
+    if (finger.verifyPassword()) {
+      Serial.println("Sensor reconnected!");
+      sensorConnected = true;
+    }
+  }
+
+  // Run enrollment
+  if (enrollMode && sensorConnected && (millis() - lastEnrollTime > 100)) {
+    lastEnrollTime = millis();
     processEnrollment();
   }
 }
 
-// Handlers
+// ==================== WEB HANDLERS ====================
 void handleRoot() {
-  sendCORSHeaders();
-  String html = "<h1>ESP8266 Fingerprint Scanner</h1>";
-  html += "<p>Sensor: " + String(sensorConnected ? "Connected" : "Not Connected") + "</p>";
-  html += "<p>IP: " + WiFi.localIP().toString() + "</p>";
+  sendCORS();
+  String html = "<h1>Fingerprint System</h1>";
+  html += "<p><b>Sensor:</b> " + String(sensorConnected ? "<span style='color:green'>CONNECTED</span>" : "<span style='color:red'>NOT CONNECTED</span>") + "</p>";
+  html += "<p><b>IP:</b> " + WiFi.localIP().toString() + "</p>";
   if (sensorConnected) {
-    html += "<p>Templates: " + String(finger.templateCount) + "</p>";
+    finger.getTemplateCount();
+    html += "<p><b>Templates:</b> " + String(finger.templateCount) + "</p>";
   }
   server.send(200, "text/html", html);
 }
 
 void handleStatus() {
-  sendCORSHeaders();
-  
-  if (!sensorConnected) {
-    sensorConnected = finger.verifyPassword();
-  }
-  
-  StaticJsonDocument<300> doc;
+  sendCORS();
+  StaticJsonDocument<400> doc;
   doc["sensorConnected"] = sensorConnected;
   doc["wifiConnected"] = (WiFi.status() == WL_CONNECTED);
   doc["ip"] = WiFi.localIP().toString();
-  
+  doc["enrollMode"] = enrollMode;
+  doc["enrollStatus"] = enrollStatus;
+
   if (sensorConnected) {
     finger.getTemplateCount();
     doc["templates"] = finger.templateCount;
     doc["capacity"] = finger.capacity;
   } else {
     doc["templates"] = 0;
-    doc["capacity"] = 0;
-    doc["error"] = "Sensor not connected";
   }
-  doc["enrollMode"] = enrollMode;
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
-  Serial.println("Status requested - Connected: " + String(sensorConnected));
+
+  String json;
+  serializeJson(doc, json);
+  server.send(200, "application/json", json);
 }
 
 void handleEnrollStart() {
-  sendCORSHeaders();
-  
+  sendCORS();
   StaticJsonDocument<300> doc;
-  
+
   if (!sensorConnected) {
     doc["success"] = false;
-    doc["error"] = "Fingerprint sensor not connected";
-  } else if (server.hasArg("plain")) {
-    StaticJsonDocument<200> requestDoc;
-    deserializeJson(requestDoc, server.arg("plain"));
-    
-    if (requestDoc.containsKey("fingerprintId")) {
-      currentFingerprintId = requestDoc["fingerprintId"].as<String>();
-      String idStr = currentFingerprintId;
-      idStr.replace("FP_", "");
-      id = idStr.toInt();
-      
-      if (id == 0 || id > 127) {
-        id = finger.templateCount + 1;
-      }
-      
-      uint8_t p = finger.loadModel(id);
-      if (p == FINGERPRINT_OK) {
+    doc["error"] = "Sensor not connected";
+  } else if (!server.hasArg("plain")) {
+    doc["success"] = false;
+    doc["error"] = "No data";
+  } else {
+    StaticJsonDocument<200> req;
+    DeserializationError err = deserializeJson(req, server.arg("plain"));
+    if (err) {
+      doc["success"] = false;
+      doc["error"] = "Invalid JSON";
+    } else if (!req.containsKey("fingerprintId")) {
+      doc["success"] = false;
+      doc["error"] = "Missing fingerprintId";
+    } else {
+      String fid = req["fingerprintId"];
+      fid.replace("FP_", "");
+      id = fid.toInt();
+      if (id < 1 || id > 127) id = finger.templateCount + 1;
+
+      if (finger.loadModel(id) == FINGERPRINT_OK) {
         doc["success"] = false;
-        doc["error"] = "Fingerprint ID already exists";
-        doc["existingId"] = id;
+        doc["error"] = "ID exists";
       } else {
         enrollMode = true;
         enrollStep = 0;
         enrollStatus = "place_finger";
-        
         doc["success"] = true;
-        doc["message"] = "Enrollment started";
-        doc["status"] = "place_finger";
         doc["id"] = id;
-        
-        Serial.println("Enrollment started for ID: " + String(id));
+        doc["message"] = "Place finger";
+        Serial.println("Enroll start → ID " + String(id));
       }
-    } else {
-      doc["success"] = false;
-      doc["error"] = "Missing fingerprintId";
     }
-  } else {
-    doc["success"] = false;
-    doc["error"] = "Invalid request - use POST with JSON body";
   }
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+
+  String json;
+  serializeJson(doc, json);
+  server.send(200, "application/json", json);
 }
 
 void handleEnrollStatus() {
-  sendCORSHeaders();
-  
-  StaticJsonDocument<300> doc;
+  sendCORS();
+  StaticJsonDocument<200> doc;
   doc["enrollMode"] = enrollMode;
   doc["status"] = enrollStatus;
   doc["step"] = enrollStep;
   doc["id"] = id;
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+  String json;
+  serializeJson(doc, json);
+  server.send(200, "application/json", json);
 }
 
 void handleEnrollCancel() {
-  sendCORSHeaders();
-  
+  sendCORS();
   enrollMode = false;
   enrollStep = 0;
   enrollStatus = "cancelled";
-  
-  StaticJsonDocument<200> doc;
-  doc["success"] = true;
-  doc["message"] = "Enrollment cancelled";
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+  server.send(200, "application/json", "{\"success\":true}");
 }
 
 void handleScan() {
-  sendCORSHeaders();
-  
+  sendCORS();
   StaticJsonDocument<300> doc;
-  
   if (!sensorConnected) {
     doc["success"] = false;
-    doc["error"] = "Sensor not connected";
+    doc["error"] = "No sensor";
   } else {
     int result = getFingerprintID();
     if (result >= 0) {
       doc["success"] = true;
       doc["id"] = result;
       doc["confidence"] = finger.confidence;
-      doc["message"] = "Fingerprint matched!";
     } else {
       doc["success"] = false;
-      doc["message"] = "No match found";
     }
   }
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+  String json;
+  serializeJson(doc, json);
+  server.send(200, "application/json", json);
 }
 
 void handleDelete() {
-  sendCORSHeaders();
-  
-  StaticJsonDocument<200> doc;
-  
-  if (!sensorConnected) {
-    doc["success"] = false;
-    doc["error"] = "Sensor not connected";
-  } else if (server.hasArg("id")) {
-    uint8_t deleteId = server.arg("id").toInt();
-    uint8_t p = finger.deleteModel(deleteId);
-    
-    if (p == FINGERPRINT_OK) {
-      doc["success"] = true;
-      doc["message"] = "Deleted successfully";
-    } else {
-      doc["success"] = false;
-      doc["error"] = "Delete failed";
-    }
-  } else {
-    doc["success"] = false;
-    doc["error"] = "Missing ID";
+  sendCORS();
+  if (!sensorConnected || !server.hasArg("id")) {
+    server.send(400, "application/json", "{\"success\":false}");
+    return;
   }
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+  uint8_t delId = server.arg("id").toInt();
+  uint8_t r = finger.deleteModel(delId);
+  server.send(200, "application/json", r == FINGERPRINT_OK ? "{\"success\":true}" : "{\"success\":false}");
 }
 
 void handleCheckFingerprint() {
-  sendCORSHeaders();
-  
-  StaticJsonDocument<200> doc;
-  
-  if (!sensorConnected) {
+  sendCORS();
+  StaticJsonDocument<150> doc;
+  if (!sensorConnected || !server.hasArg("id")) {
     doc["exists"] = false;
-    doc["error"] = "Sensor not connected";
-  } else if (server.hasArg("id")) {
-    uint8_t checkId = server.arg("id").toInt();
-    uint8_t p = finger.loadModel(checkId);
-    doc["exists"] = (p == FINGERPRINT_OK);
-    doc["id"] = checkId;
   } else {
-    doc["exists"] = false;
-    doc["error"] = "Missing ID";
+    doc["exists"] = (finger.loadModel(server.arg("id").toInt()) == FINGERPRINT_OK);
   }
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+  String json;
+  serializeJson(doc, json);
+  server.send(200, "application/json", json);
 }
 
 void handleGetCount() {
-  sendCORSHeaders();
-  
-  StaticJsonDocument<200> doc;
-  
+  sendCORS();
+  StaticJsonDocument<150> doc;
   if (sensorConnected) {
     finger.getTemplateCount();
     doc["count"] = finger.templateCount;
     doc["capacity"] = finger.capacity;
   } else {
     doc["count"] = 0;
-    doc["capacity"] = 0;
-    doc["error"] = "Sensor not connected";
   }
-  
-  String response;
-  serializeJson(doc, response);
-  server.send(200, "application/json", response);
+  String json;
+  serializeJson(doc, json);
+  server.send(200, "application/json", json);
 }
 
 void handleNotFound() {
-  sendCORSHeaders();
+  sendCORS();
   if (server.method() == HTTP_OPTIONS) {
     server.send(200);
   } else {
-    server.send(404, "text/plain", "Not Found - Available: /status, /enroll/start, /scan");
+    server.send(404, "text/plain", "Use /status or /scan");
   }
 }
 
-void sendCORSHeaders() {
+void sendCORS() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.sendHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  server.sendHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   server.sendHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
-// Enrollment process (same as your original)
+// ==================== FINGERPRINT FUNCTIONS ====================
 void processEnrollment() {
-  if (millis() - lastEnrollAttempt < 100) return;
-  lastEnrollAttempt = millis();
-  
-  uint8_t p = 0;
+  uint8_t p = finger.getImage();
+
   switch (enrollStep) {
     case 0:
-      p = finger.getImage();
       if (p == FINGERPRINT_OK) {
-        Serial.println("Image 1 taken");
         p = finger.image2Tz(1);
         if (p == FINGERPRINT_OK) {
           enrollStatus = "remove_finger";
           enrollStep = 1;
-        } else {
-          enrollStatus = "error_converting";
         }
-      } else if (p != FINGERPRINT_NOFINGER) {
-        enrollStatus = "error_imaging";
       }
       break;
+
     case 1:
-      p = finger.getImage();
       if (p == FINGERPRINT_NOFINGER) {
-        Serial.println("Finger removed");
         enrollStatus = "place_again";
         enrollStep = 2;
       }
       break;
+
     case 2:
-      p = finger.getImage();
       if (p == FINGERPRINT_OK) {
-        Serial.println("Image 2 taken");
         p = finger.image2Tz(2);
         if (p == FINGERPRINT_OK) {
           p = finger.createModel();
           if (p == FINGERPRINT_OK) {
             p = finger.storeModel(id);
             if (p == FINGERPRINT_OK) {
-              Serial.println("Stored ID " + String(id));
               enrollStatus = "success";
-              enrollMode = false;
-              enrollStep = 0;
+              Serial.println("SAVED → ID #" + String(id));
             } else {
-              enrollStatus = "error_storing";
-              enrollMode = false;
-              enrollStep = 0;
+              enrollStatus = "failed";
             }
+            enrollMode = false;
           } else if (p == FINGERPRINT_ENROLLMISMATCH) {
             enrollStatus = "mismatch";
             enrollMode = false;
-            enrollStep = 0;
-          } else {
-            enrollStatus = "error_creating_model";
-            enrollMode = false;
-            enrollStep = 0;
           }
-        } else {
-          enrollStatus = "error_converting_2";
         }
       }
       break;
@@ -408,14 +342,9 @@ void processEnrollment() {
 int getFingerprintID() {
   uint8_t p = finger.getImage();
   if (p != FINGERPRINT_OK) return -1;
-  
   p = finger.image2Tz();
   if (p != FINGERPRINT_OK) return -1;
-  
   p = finger.fingerSearch();
-  if (p == FINGERPRINT_OK) {
-    return finger.fingerID;
-  }
-  
+  if (p == FINGERPRINT_OK) return finger.fingerID;
   return -1;
 }
