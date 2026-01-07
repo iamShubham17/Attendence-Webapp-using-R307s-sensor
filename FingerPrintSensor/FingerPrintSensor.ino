@@ -15,8 +15,8 @@
 #include <ArduinoJson.h>
 
 // ==================== CONFIG ====================
-const char* ssid = "Happy Home";
-const char* password = "Giradkar@1717";
+const char* ssid = "Shubham";
+const char* password = "8830713650";
 
 // Your wiring: TX(sensor) → D1, RX(sensor) → D2
 SoftwareSerial mySerial(5, 4);                    // RX = GPIO5 (D1), TX = GPIO4 (D2)
